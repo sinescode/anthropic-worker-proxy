@@ -345,20 +345,3 @@ pub struct OutputUsage {
     pub output_tokens: u32,
 }
 
-// ══════════════════════════════════════════════════════════════════
-// Error Response
-// ══════════════════════════════════════════════════════════════════
-
-#[derive(Debug, Serialize)]
-pub struct ErrorResponse {
-    #[serde(rename = "type")]
-    pub error_type: String,
-    pub error: ErrorDetail,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ErrorDetail {
-    #[serde(rename = "type")]
-    pub error_type: String,
-    pub message: String,
-}
