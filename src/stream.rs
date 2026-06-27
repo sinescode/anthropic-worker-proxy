@@ -63,9 +63,16 @@ async fn rest_streaming(
             .with_body(Some(Body::from_json(input)?)),
     )?;
 
-    let resp = fetch(fetch_req).await.map_err(|e| {
-        Error::RustError(format!("Failed to call Workers AI REST API: {e}"))
-    })?;
+    let resp = match fetch(fetch_req).await {
+        Ok(r) => r,
+        Err(e) => {
+            return crate::error_response(
+                "api_error",
+                &format!("Failed to reach Workers AI REST API: {e}"),
+                Some(502),
+            );
+        }
+    };
 
     if !resp.status().is_success() {
         let status = resp.status();
