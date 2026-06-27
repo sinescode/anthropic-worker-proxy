@@ -17,11 +17,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     let mut resp = match req.url()?.path() {
         "/v1/messages" if req.method() == Method::Post => handle_messages(req, env).await,
         "/v1/models" => handle_models(),
-        "/" | "/health" => Ok(Response::from_json(&serde_json::json!({
-            "status": "ok",
-            "service": "anthropic-worker-proxy",
-            "version": "0.3.0"
-        }))?),
+        "/" | "/health" => health_check(&env),
         _ => error_response("not_found", "Endpoint not found", Some(404)),
     };
 
@@ -162,6 +158,30 @@ fn handle_models() -> Result<Response> {
 // ══════════════════════════════════════════════════════════════════
 // Helpers
 // ══════════════════════════════════════════════════════════════════
+
+fn health_check(env: &Env) -> Result<Response> {
+    let has_account_id = env.var("CLOUDFLARE_ACCOUNT_ID").ok().map(|v| !v.to_string().is_empty()).unwrap_or(false);
+    let has_api_token = env.var("CLOUDFLARE_API_TOKEN").ok().map(|v| !v.to_string().is_empty()).unwrap_or(false);
+
+    Response::from_json(&serde_json::json!({
+        "status": "ok",
+        "service": "anthropic-worker-proxy",
+        "version": "0.3.0",
+        "streaming": {
+            "enabled": has_account_id && has_api_token,
+            "mode": if has_account_id && has_api_token { "token-by-token SSE" } else { "single-chunk fallback" },
+            "configured": {
+                "cloudflare_account_id": has_account_id,
+                "cloudflare_api_token": has_api_token
+            },
+            "setup_help": if !has_account_id || !has_api_token {
+                Some("To enable token-by-token streaming, run: wrangler secret put CLOUDFLARE_ACCOUNT_ID && wrangler secret put CLOUDFLARE_API_TOKEN")
+            } else {
+                None
+            }
+        }
+    }))
+}
 
 fn cors_response(status: u16) -> Result<Response> {
     let mut resp = Response::builder().with_status(status).empty()?;
