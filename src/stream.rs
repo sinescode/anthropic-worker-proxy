@@ -85,7 +85,7 @@ async fn rest_streaming(
     }
 
     // Read the SSE stream and convert to Anthropic format
-    let stream = build_anthropic_sse_stream(resp, anthropic_model).await?;
+    let stream = build_anthropic_sse_stream(resp, anthropic_model).await;
 
     Response::builder()
         .with_status(200)
@@ -99,7 +99,7 @@ async fn rest_streaming(
 async fn build_anthropic_sse_stream(
     mut resp: worker::Response,
     anthropic_model: &str,
-) -> Result<String> {
+) -> String {
     let mut output = String::new();
 
     // message_start
@@ -280,7 +280,7 @@ async fn build_anthropic_sse_stream(
 
     push_event_str(&mut output, "message_stop", r#"{"type":"message_stop"}"#);
 
-    Ok(output)
+    output
 }
 
 /// Fallback: non-streaming binding response sent as a single-chunk SSE stream.
