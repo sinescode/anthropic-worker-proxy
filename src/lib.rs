@@ -191,6 +191,12 @@ fn cors_response(status: u16) -> Result<Response> {
     Ok(resp)
 }
 
+pub(crate) fn make_id() -> String {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let t = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
+    format!("{}{:06}", t.as_secs(), t.subsec_micros())
+}
+
 pub(crate) fn error_response(error_type: &str, message: &str, status: Option<u16>) -> Result<Response> {
     let body = anthropic_error(error_type, message);
     let s = status.unwrap_or(400);

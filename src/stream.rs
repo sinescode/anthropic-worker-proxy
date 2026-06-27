@@ -106,7 +106,7 @@ async fn build_anthropic_sse_stream(
     push_event(&mut output, "message_start", &MessageStart {
         event_type: "message_start".into(),
         message: MessageStartMessage {
-            id: format!("msg_{}", make_id()),
+            id: format!("msg_{}", crate::make_id()),
             msg_type: "message".into(),
             role: "assistant".into(),
             model: anthropic_model.into(),
@@ -381,12 +381,6 @@ fn push_event(output: &mut String, name: &str, data: &impl serde::Serialize) {
 
 fn push_event_str(output: &mut String, name: &str, data: &str) {
     output.push_str(&format!("event: {name}\ndata: {data}\n\n"));
-}
-
-fn make_id() -> String {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let t = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
-    format!("{}{:06}", t.as_secs(), t.subsec_micros())
 }
 
 struct ToolState {

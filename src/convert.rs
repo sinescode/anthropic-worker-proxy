@@ -168,7 +168,7 @@ pub fn to_anthropic_response(model: &str, result: &Value) -> Response {
     let usage = extract_usage(result);
 
     Response {
-        id: format!("msg_{}", make_id()),
+        id: format!("msg_{}", crate::make_id()),
         response_type: "message".into(),
         role: "assistant".into(),
         model: model.into(),
@@ -276,10 +276,4 @@ fn extract_tool_result_text(content: &Option<Value>) -> String {
         Some(other) => other.to_string(),
         None => String::new(),
     }
-}
-
-fn make_id() -> String {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let t = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
-    format!("{}{:06}", t.as_secs(), t.subsec_micros())
 }
