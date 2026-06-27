@@ -123,7 +123,7 @@ fn handle_models() -> Result<Response> {
 
     // Popular Workers AI models (usable via cf-model header)
     let workers_models = vec![
-        ("@cf/meta/llama-3.1-8b-instruct", "Llama 3.1 8B — fast, good for chat"),
+        ("@cf/meta/llama-3.1-8b-instruct-fast", "Llama 3.1 8B Fast — fast, good for chat"),
         ("@cf/meta/llama-3.3-70b-instruct-fp8-fast", "Llama 3.3 70B — best free model"),
         ("@cf/meta/llama-4-scout-17b-16e-instruct", "Llama 4 Scout 17B — latest Llama"),
         ("@cf/qwen/qwen2.5-coder-32b-instruct", "Qwen 2.5 Coder 32B — best for code"),

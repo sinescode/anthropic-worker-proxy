@@ -17,13 +17,13 @@ impl ModelMap {
         let mut defaults = HashMap::new();
         defaults.insert("claude-sonnet-4-5", "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
         defaults.insert("claude-sonnet-4-5-20250929", "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
-        defaults.insert("claude-haiku-4-5", "@cf/meta/llama-3.1-8b-instruct");
-        defaults.insert("claude-haiku-4-5-20251001", "@cf/meta/llama-3.1-8b-instruct");
+        defaults.insert("claude-haiku-4-5", "@cf/meta/llama-3.1-8b-instruct-fast");
+        defaults.insert("claude-haiku-4-5-20251001", "@cf/meta/llama-3.1-8b-instruct-fast");
         defaults.insert("claude-opus-4-5", "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
         defaults.insert("claude-opus-4-5-20251101", "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
         defaults.insert("claude-sonnet-4-6", "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
         defaults.insert("claude-opus-4-6", "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
-        defaults.insert("claude-fable-5", "@cf/meta/llama-3.1-8b-instruct");
+        defaults.insert("claude-fable-5", "@cf/meta/llama-3.1-8b-instruct-fast");
 
         let default_model = std::env::var("DEFAULT_MODEL")
             .unwrap_or_else(|_| "@cf/meta/llama-3.3-70b-instruct-fp8-fast".into());
