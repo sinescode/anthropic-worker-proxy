@@ -122,6 +122,7 @@ async fn build_anthropic_sse_stream(
     let mut block_index: usize = 0;
     let mut text_started = false;
     let mut finish_reason = "end_turn".to_string();
+    let mut output_tokens: u32 = 0;
     let mut active_tool_calls: std::collections::HashMap<u32, ToolState> = std::collections::HashMap::new();
 
     // Read the response body as text and parse SSE lines
@@ -243,15 +244,7 @@ async fn build_anthropic_sse_stream(
 
         // ── Usage ──
         if let Some(usage) = chunk.get("usage") {
-            let output_tokens = usage.get("completion_tokens").and_then(|t| t.as_u64()).unwrap_or(0) as u32;
-            push_event(&mut output, "message_delta", &MessageDelta {
-                event_type: "message_delta".into(),
-                delta: MessageDeltaDelta {
-                    stop_reason: Some(finish_reason.clone()),
-                    stop_sequence: None,
-                },
-                usage: OutputUsage { output_tokens },
-            });
+            output_tokens = usage.get("completion_tokens").and_then(|t| t.as_u64()).unwrap_or(0) as u32;
         }
     }
 
@@ -274,6 +267,16 @@ async fn build_anthropic_sse_stream(
             index: cb_idx,
         });
     }
+
+    // Emit message_delta after all content blocks are closed
+    push_event(&mut output, "message_delta", &MessageDelta {
+        event_type: "message_delta".into(),
+        delta: MessageDeltaDelta {
+            stop_reason: Some(finish_reason),
+            stop_sequence: None,
+        },
+        usage: OutputUsage { output_tokens },
+    });
 
     push_event_str(&mut output, "message_stop", r#"{"type":"message_stop"}"#);
 
