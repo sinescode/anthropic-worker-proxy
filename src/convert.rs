@@ -55,6 +55,16 @@ pub fn to_workers_input(req: &AnthropicRequest) -> Result<Value, String> {
 
     // Tool choice
     if let Some(tc) = &req.tool_choice {
+        let disable_parallel = match tc {
+            ToolChoice::Auto { disable_parallel_tool_use } => *disable_parallel_tool_use,
+            ToolChoice::Any { disable_parallel_tool_use } => *disable_parallel_tool_use,
+            ToolChoice::Tool { disable_parallel_tool_use, .. } => *disable_parallel_tool_use,
+            ToolChoice::None => None,
+        };
+        if disable_parallel.unwrap_or(false) {
+            input["parallel_tool_calls"] = json!(false);
+        }
+
         input["tool_choice"] = match tc {
             ToolChoice::Auto { .. } => json!("auto"),
             ToolChoice::Any { .. } => json!("required"),
