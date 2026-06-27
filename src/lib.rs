@@ -110,26 +110,20 @@ async fn handle_messages(mut req: Request, env: Env) -> Result<Response> {
 fn handle_models() -> Result<Response> {
     let model_map = ModelMap::from_env();
 
-    // Built-in Anthropic models → Workers AI mapping
-    let anthropic_models: Vec<serde_json::Value> = vec![
-        "claude-sonnet-4-5",
-        "claude-haiku-4-5",
-        "claude-opus-4-5",
-        "claude-sonnet-4-6",
-        "claude-opus-4-6",
-        "claude-fable-5",
-    ]
-    .into_iter()
-    .map(|m| {
-        let workers = model_map.resolve(m);
-        serde_json::json!({
-            "id": m,
-            "object": "model",
-            "owned_by": "anthropic-worker-proxy",
-            "workers_ai_model": workers
+    // Built-in Anthropic models → Workers AI mapping (generated from defaults)
+    let anthropic_models: Vec<serde_json::Value> = model_map
+        .known_models()
+        .into_iter()
+        .map(|m| {
+            let workers = model_map.resolve(m);
+            serde_json::json!({
+                "id": m,
+                "object": "model",
+                "owned_by": "anthropic-worker-proxy",
+                "workers_ai_model": workers
+            })
         })
-    })
-    .collect();
+        .collect();
 
     // Popular Workers AI models (usable via cf-model header)
     let workers_models = vec![

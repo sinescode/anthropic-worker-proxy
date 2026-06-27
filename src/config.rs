@@ -63,6 +63,13 @@ impl ModelMap {
     pub fn default_model(&self) -> &str {
         &self.default_model
     }
+
+    /// All known Anthropic model names (keys from the built-in defaults map).
+    pub fn known_models(&self) -> Vec<&str> {
+        let mut names: Vec<&str> = self.defaults.keys().copied().collect();
+        names.sort();
+        names
+    }
 }
 
 /// CORS headers for browser-based clients.
