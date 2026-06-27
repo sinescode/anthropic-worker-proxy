@@ -77,7 +77,7 @@ impl Content {
     }
 
     pub fn is_tool_use(&self) -> bool {
-        matches!(self, Content::Blocks(blocks) if blocks.iter().any(|b| matches!(b, Block::ToolUse { .. })))
+        matches!(self, Content::Blocks(blocks) if blocks.iter().any(|b| matches!(b, Block::ToolUse { .. } | Block::ServerToolUse { .. })))
     }
 
     pub fn tool_results(&self) -> Vec<ToolResultBlock> {
@@ -97,12 +97,47 @@ impl Content {
         }
     }
 
+    pub fn extract_web_search_text(&self) -> Option<String> {
+        match self {
+            Content::Blocks(blocks) => {
+                let parts: Vec<String> = blocks
+                    .iter()
+                    .filter_map(|b| match b {
+                        Block::WebSearchToolResult { content, url, title } => {
+                            let mut text = String::new();
+                            if let Some(t) = title { text.push_str(&format!("[{}] ", t)); }
+                            if let Some(c) = content {
+                                match c {
+                                    Value::String(s) => text.push_str(s),
+                                    Value::Array(arr) => {
+                                        for item in arr {
+                                            if let Some(t) = item.get("text").and_then(|v| v.as_str()) {
+                                                text.push_str(t);
+                                            }
+                                        }
+                                    }
+                                    other => { let _ = other; }
+                                }
+                            }
+                            if let Some(u) = url { text.push_str(&format!("\nSource: {u}")); }
+                            if text.is_empty() { None } else { Some(text) }
+                        }
+                        _ => None,
+                    })
+                    .collect();
+                if parts.is_empty() { None } else { Some(parts.join("\n\n")) }
+            }
+            _ => None,
+        }
+    }
+
     pub fn tool_uses(&self) -> Vec<ToolUseBlock> {
         match self {
             Content::Blocks(blocks) => blocks
                 .iter()
                 .filter_map(|b| match b {
-                    Block::ToolUse { id, name, input } => Some(ToolUseBlock {
+                    Block::ToolUse { id, name, input }
+                    | Block::ServerToolUse { id, name, input } => Some(ToolUseBlock {
                         id: id.clone(),
                         name: name.clone(),
                         input: input.clone(),
@@ -140,6 +175,21 @@ pub enum Block {
     Thinking { thinking: String, #[serde(default)] signature: Option<String> },
     #[serde(rename = "redacted_thinking")]
     RedactedThinking { data: String },
+    #[serde(rename = "server_tool_use")]
+    ServerToolUse {
+        id: String,
+        name: String,
+        input: Value,
+    },
+    #[serde(rename = "web_search_tool_result")]
+    WebSearchToolResult {
+        #[serde(default)]
+        content: Option<Value>,
+        #[serde(default)]
+        url: Option<String>,
+        #[serde(default)]
+        title: Option<String>,
+    },
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

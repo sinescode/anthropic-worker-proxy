@@ -129,7 +129,13 @@ fn convert_message(msg: &Message) -> Result<Vec<Value>, String> {
             } else {
                 // Regular content blocks
                 let images = msg.content.extract_images();
-                let text = msg.content.extract_text();
+                let mut text = msg.content.extract_text();
+
+                // Append web search results to text
+                if let Some(search_text) = msg.content.extract_web_search_text() {
+                    if !text.is_empty() { text.push_str("\n\n"); }
+                    text.push_str(&search_text);
+                }
 
                 if !images.is_empty() {
                     let mut content_array = Vec::new();
