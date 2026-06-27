@@ -208,7 +208,7 @@ async fn build_anthropic_sse_stream(
                             "stop" => "end_turn",
                             "tool_calls" | "function_call" => "tool_use",
                             "length" => "max_tokens",
-                            other => other,
+                            _ => "end_turn",
                         }.to_string();
                     }
                 }

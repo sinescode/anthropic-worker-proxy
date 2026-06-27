@@ -230,7 +230,7 @@ fn extract_stop_reason(result: &Value) -> Option<String> {
             "stop" => "end_turn",
             "tool_calls" | "function_call" => "tool_use",
             "length" => "max_tokens",
-            other => other,
+            _ => "end_turn",
         })
         .map(String::from)
         .or_else(|| Some("end_turn".to_string()))
