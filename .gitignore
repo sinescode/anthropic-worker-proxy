@@ -1,0 +1,14 @@
+# Build output
+target/
+dist/
+build/
+*.wasm
+
+# Cloudflare
+.wrangler/
+
+# Claude Code session data
+.claude/
+
+# Rust
+**/*.rs.bk
