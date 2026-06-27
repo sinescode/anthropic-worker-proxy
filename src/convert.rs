@@ -133,6 +133,11 @@ fn convert_message(msg: &Message) -> Result<Vec<Value>, String> {
                                 "type": "image_url",
                                 "image_url": { "url": format!("data:{mt};base64,{data}") }
                             }));
+                        } else if let Some(url) = &img.url {
+                            content_array.push(json!({
+                                "type": "image_url",
+                                "image_url": { "url": url }
+                            }));
                         }
                     }
                     out.push(json!({ "role": msg.role, "content": content_array }));
