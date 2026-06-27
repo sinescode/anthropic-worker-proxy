@@ -50,6 +50,12 @@ Without these, streaming falls back to single-chunk mode (all tokens at once).
 | `claude-sonnet-4-5` | `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
 | `claude-haiku-4-5` | `@cf/meta/llama-3.1-8b-instruct` |
 | `claude-opus-4-5` | `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
+| `claude-sonnet-4-6` | `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
+| `claude-opus-4-6` | `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
+| `claude-fable-5` | `@cf/meta/llama-3.1-8b-instruct` |
+
+Dated variants (e.g. `claude-sonnet-4-5-20250929`) are also mapped.
+See `/v1/models` for the full list.
 
 ### Custom model mapping via env vars
 
